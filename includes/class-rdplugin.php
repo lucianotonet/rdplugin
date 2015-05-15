@@ -241,17 +241,20 @@ class Rdplugin {
 	}
 
 
-	public function addLeadConversionToRdstationCrm( $rdstation_token, $identifier, $data_array ) {
+	public function addLeadConversionToRdstationCrm( $rdstation_token, $identifier = null, $data_array ) {
+		
+		$data_array["token_rdstation"] = isset($data_array["token_rdstation"]) ? $data_array["token_rdstation"] : $this->token_rdstation;	
 
-		$data_array["token_rdstation"] = $this->rdstation_token;
+		$data_array["identificador"] = isset( $data_array["identificador"] ) ? $data_array["identificador"] : $identifier;
 
-		if ( empty( $data_array["identificador"] ) && !empty( $identifier ) ) {
-			$data_array["identificador"] = $identifier;
-		}
-		if ( empty( $data_array["email"] ) and isset( $data_array["your-email"] ) ) {
+		if ( isset( $data_array["your-email"] ) && !empty( $data_array["your-email"] ) ) {
 			$data_array["email"] = $data_array["your-email"];
+		}else 
+		if ( isset( $data_array["email"] ) && !empty( $data_array["email"] ) ) {
+			$data_array["email"] = $data_array["email"];
 		}
-		if ( empty( $data_array["c_utmz"] ) ) {
+		
+		if ( isset( $data_array["c_utmz"] ) && empty( $data_array["c_utmz"] ) ) {
 			$data_array["c_utmz"] = $_COOKIE["__utmz"];
 		}
 
@@ -277,7 +280,19 @@ class Rdplugin {
 
 			if ( is_wp_error( $response ) ) {
 				$error_message = $response->get_error_message();
-				echo "Something went wrong: $error_message";
+				$message = "Something went wrong: $error_message";
+				if (is_array($message) || is_object($message)) {
+		            error_log(print_r($message, true));
+		        } else {
+		            error_log($message);
+		        }
+			}else{
+				$message = $response;
+				if (is_array($message) || is_object($message)) {
+		            error_log(print_r($message, true));
+		        } else {
+		            error_log($message);
+		        }
 			}
 
 		}
